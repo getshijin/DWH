@@ -1,0 +1,31 @@
+create or replace database EXERCISE_DB ;
+
+CREATE OR REPLACE STAGE MANAGE_DB.EXTERNAL_STAGES.EXERCISE_STAGE
+    url='s3://snowflake-assignments-mc/fileformat/';
+
+LIST @exercise_stage;
+
+
+---Create x´customer table
+CREATE OR REPLACE  TABLE EXERCISE_DB.PUBLIC.CUSTOMER(
+ID INT,
+first_name varchar,
+last_name varchar,
+email varchar,
+age int,
+city varchar
+);
+
+CREATE OR REPLACE FILE FORMAT MANAGE_DB.file_formats.ex_my_file_format
+FIELD_DELIMITER='|', SKIP_HEADER = 1;
+
+desc file format MANAGE_DB.file_formats.ex_my_file_format;
+
+COPY INTO EXERCISE_DB.PUBLIC.CUSTOMER
+from @EXERCISE_STAGE
+file_format = (FORMAT_NAME=MANAGE_DB.file_formats.ex_my_file_format);
+
+select count(*) from EXERCISE_DB.PUBLIC.CUSTOMER;
+
+SELECT file_name, rows_loaded, errors_seen, status
+FROM TABLE(RESULT_SCAN(LAST_QUERY_ID()));
