@@ -1,0 +1,44 @@
+CREATE OR REPLACE STAGE EXERCISE_DB.PUBLIC.aws_stage_copy
+    url='s3://snowflake-assignments-mc/unstructureddata/';
+
+//LIST stages
+LIST @EXERCISE_DB.PUBLIC.aws_stage_copy;
+
+//create schema file_formats
+CREATE OR REPLACE SCHEMA EXERCISE_DB.file_formats;
+
+//Create file format JSONFORMAT
+CREATE OR REPLACE file format EXERCISE_DB.FILE_FORMATS.JSONFORMAT
+    TYPE = JSON;
+
+//Create Table
+CREATE OR REPLACE table exercise_db.PUBLIC.JSON_RAW (
+RAW VARIANT
+);
+
+copy into exercise_db.PUBLIC.JSON_RAW
+from @EXERCISE_DB.PUBLIC.aws_stage_copy
+file_format= EXERCISE_DB.FILE_FORMATS.JSONFORMAT
+files = ('Jobskills.json');
+
+//select data
+select * from exercise_db.PUBLIC.JSON_RAW;
+
+//parsing data inside an dict
+
+select RAW:first_name::String as first_name,
+RAW:last_name::String  as last_name,
+RAW:Skills as Skills,
+RAW:Skills[0] as Skills_1,
+RAW:Skills[1] as Skills_2
+from exercise_db.PUBLIC.JSON_RAW;
+
+
+create or replace table  exercise_db.PUBLIC.JSON_RAW_sub as
+select RAW:first_name::String as first_name,
+RAW:last_name::String  as last_name,
+RAW:Skills[0] as Skills_1,
+RAW:Skills[1] as Skills_2
+from exercise_db.PUBLIC.JSON_RAW;
+
+Select * from exercise_db.PUBLIC.JSON_RAW_sub;
