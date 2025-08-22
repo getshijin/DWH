@@ -1,0 +1,22 @@
+//create user & create compute wahrehouse
+
+USE ROLE SYSADMIN;
+
+//create DB & schemas
+create database if not exists criket;
+create or replace schema criket.land;
+create or replace schema criket.raw;
+create or replace schema criket.clean;
+create or replace schema criket.consumption;
+
+show schemas in database criket;
+
+//Create file Format
+create or replace file format criket.land.my_json_format
+type=json
+null_if= ('\\n','\\null','')
+strip_outer_array= true
+comment='JSON File Format With outer strip arrray flag true';
+
+//create Stage for accesing the structured or unstructured or semistructured files
+create or replace stage criket.land.my_stg;
