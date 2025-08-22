@@ -3,20 +3,41 @@
 USE ROLE SYSADMIN;
 
 //create DB & schemas
-create database if not exists criket;
-create or replace schema criket.land;
-create or replace schema criket.raw;
-create or replace schema criket.clean;
-create or replace schema criket.consumption;
+create database if not exists Lending_club;
+create or replace schema Lending_club.land;
+create or replace schema Lending_club.raw;
+create or replace schema Lending_club.clean;
+create or replace schema Lending_club.consumption;
 
-show schemas in database criket;
+show schemas in database Lending_club;
 
 //Create file Format
-create or replace file format criket.land.my_json_format
-type=json
-null_if= ('\\n','\\null','')
-strip_outer_array= true
-comment='JSON File Format With outer strip arrray flag true';
+create or replace file format Lending_club.land.my_csv_format;
+
+GRANT CREATE INTEGRATION ON ACCOUNT TO ROLE SYSADMIN;
+
+//Stprage intergration
+CREATE or replace STORAGE INTEGRATION my_s3_integration
+  TYPE = EXTERNAL_STAGE
+  STORAGE_PROVIDER = S3
+  ENABLED = TRUE
+  STORAGE_AWS_ROLE_ARN = 'arn:aws:iam::112779684945:role/Snowflake_aws_access'
+  STORAGE_ALLOWED_LOCATIONS = ('s3://snowflakes3bucketshijin123/csv/lendingclub/');
 
 //create Stage for accesing the structured or unstructured or semistructured files
-create or replace stage criket.land.my_stg;
+create or replace stage Lending_club.land.my_s3_integration
+ URL = 's3://snowflakes3bucketshijin123/csv/lendingclub/'
+    STORAGE_INTEGRATION = my_s3_integration
+    FILE_FORMAT = Lending_club.land.my_csv_format;
+
+//Desc Integration
+DESC INTEGRATION my_s3_integration;
+
+//Show stage
+list @Lending_club.land.my_s3_integration;
+
+
+
+
+
+
