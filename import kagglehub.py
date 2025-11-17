@@ -35,3 +35,5 @@ split_csv(
     250,
     encoding="utf-8"
 )
+
+print("All done!")
